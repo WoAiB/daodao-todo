@@ -218,6 +218,7 @@
     background: color-mix(in srgb, var(--cat) 14%, var(--card));
     color: color-mix(in srgb, var(--cat) 82%, var(--text));
   }
+  .task-meta .warn { color: var(--c-ddl); font-weight: 600; }
 
   .add-task {
     margin-top: 12px;
@@ -677,6 +678,9 @@
   .gh-day.drag-over, .ad-cell.drag-over, .col.drag-over, .mday.drag-over {
     background: color-mix(in srgb, var(--c-sport) 22%, var(--card));
     outline: 2px dashed var(--c-sport); outline-offset: -2px;
+  }
+  #todayPanel.drag-over {
+    outline: 2px dashed var(--c-sport); outline-offset: -6px;
   }
 
   /* 已完成 / 归档列表 */

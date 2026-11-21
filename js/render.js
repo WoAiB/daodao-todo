@@ -2,7 +2,7 @@
 
 import { db } from './db.js';
 import {
-  todayStr, weekDates, dateStr, dayHead, ddlText, toMinutes,
+  todayStr, weekDates, dateStr, dayHead, ddlText, daysUntil, toMinutes,
   todayIdxInWeek, periodOf,
 } from './util.js';
 
@@ -109,7 +109,11 @@ function taskMeta(t, vmMap) {
     const vm = vmMap[t.routineId];
     return `<span class="pill">习惯</span><span>${vm && vm.streak ? '连续 ' + vm.streak + ' 天' : ''}</span>`;
   }
-  if (t.type === 'ddl') return `<span class="pill">DDL</span><span>${esc(ddlText(t.deadline || t.date))}</span>`;
+  if (t.type === 'ddl') {
+    const n = t.deadline || t.date;
+    const warn = daysUntil(n) <= 1;
+    return `<span class="pill">DDL</span><span class="${warn ? 'warn' : ''}">${esc(ddlText(n))}</span>`;
+  }
   if (t.type === 'event') return `<span>${esc(t.startTime || '')}${t.endTime ? ' – ' + esc(t.endTime) : ''}</span>`;
   return t.note ? `<span>${esc(t.note)}</span>` : '';
 }
@@ -149,8 +153,7 @@ export function renderToday(tasks, vmMap) {
 function weekItemMeta(t) {
   if (t.type === 'ddl') {
     const n = t.deadline || t.date;
-    const days = (new Date(n) - new Date(todayStr())) / 86400000;
-    return { text: 'DDL · ' + ddlText(n), warn: days <= 1 };
+    return { text: 'DDL · ' + ddlText(n), warn: daysUntil(n) <= 1 };
   }
   if (t.type === 'routine_instance') return { text: '习惯', warn: false };
   if (t.type === 'event') return { text: t.startTime + (t.endTime ? ' – ' + t.endTime : ''), warn: false };

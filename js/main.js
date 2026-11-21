@@ -304,7 +304,7 @@ editTaskModal.backdrop.addEventListener('keydown', (e) => {
 /* ═══════════ 拖拽改期（清单 ↔ 日历互拖） ═══════════ */
 let dragTaskId = null;
 let dropHighlight = null;
-const DROP_TARGETS = '.ad-cell, .col, .gh-day, .mday';
+const DROP_TARGETS = '.ad-cell, .col, .gh-day, .mday, #todayPanel';
 
 document.addEventListener('dragstart', (e) => {
   if (e.target.closest('.t-del, .cb, .wi-check')) return; // 点删除/勾选不触发拖拽
@@ -338,6 +338,22 @@ document.addEventListener('drop', async (e) => {
   const id = dragTaskId;
   dragTaskId = null;
   if (dropHighlight) { dropHighlight.classList.remove('drag-over'); dropHighlight = null; }
+
+  // 拖到「今日 To Do」面板 → 改到今天（本周待办里的昨天/未来事项都能直接拖进来）
+  if (target.id === 'todayPanel') {
+    const date = todayStr();
+    const t = await db.get('tasks', id);
+    if (!t) return;
+    if (t.date === date) return; // 本来就在今天，无需处理
+    t.date = date;
+    if (t.type === 'ddl') t.deadline = date;
+    t.updatedAt = Date.now();
+    await db.put('tasks', t);
+    await refresh();
+    R.toast('已移到今日 To Do');
+    return;
+  }
+
   const date = target.dataset.date;
   if (!date) return;
   const t = await db.get('tasks', id);
