@@ -49,6 +49,14 @@ async function removeRoutineInstances(routineId) {
   }
 }
 
+/* 修改习惯打卡日后，删掉不再属于新打卡日的实例（否则旧日子会残留在本周待办 / 日历里） */
+async function pruneRoutineInstances(routineId, daysOfWeek) {
+  for (const t of await db.getWhere('tasks', x => x.type === 'routine_instance' && x.routineId === routineId)) {
+    const wd = new Date(t.date.replace(/-/g, '/')).getDay();
+    if (!daysOfWeek.includes(wd)) await db.delete('tasks', t.id);
+  }
+}
+
 /* ═══════════ 数据刷新 ═══════════ */
 async function refresh() {
   await ensureRoutineInstances(); // 先补齐习惯实例，再取数渲染
@@ -565,6 +573,8 @@ routineModal.backdrop.addEventListener('click', async (e) => {
       const oldTitle = r.title;
       Object.assign(r, { title: name, daysOfWeek: days, categoryId });
       await db.put('routines', r);
+      // 打卡日变了 → 清掉旧打卡日残留的实例，只保留新日程里的日子
+      await pruneRoutineInstances(r.id, days);
       // 改名时同步奖章名（保持「习惯名 · 铜/银/金」）
       if (oldTitle !== name) {
         for (const d of await db.getAll('badgeDefs')) {
