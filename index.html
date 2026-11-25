@@ -457,6 +457,68 @@
     100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.15); opacity: 0; }
   }
 
+  /* ============ 获得奖章动效 ============ */
+  .badge-celebrate {
+    position: fixed; inset: 0; z-index: 420;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    pointer-events: none; opacity: 0;
+  }
+  .badge-celebrate.show { animation: bc-fade 2.4s ease forwards; }
+  @keyframes bc-fade { 0% { opacity: 0; } 5% { opacity: 1; } 88% { opacity: 1; } 100% { opacity: 0; } }
+  .badge-celebrate .bc-backdrop {
+    position: absolute; inset: 0;
+    background: radial-gradient(closest-side, color-mix(in srgb, #FFC94D 14%, transparent), transparent 70%);
+  }
+  .badge-celebrate .bc-glow {
+    position: absolute; left: 50%; top: 50%;
+    width: 300px; height: 300px; margin: -150px 0 0 -150px; border-radius: 50%;
+    background: radial-gradient(closest-side, color-mix(in srgb, #FFC94D 45%, transparent), transparent);
+    animation: bc-pulse 1.3s ease-in-out infinite;
+  }
+  @keyframes bc-pulse { 0%, 100% { transform: scale(1); opacity: .8; } 50% { transform: scale(1.16); opacity: 1; } }
+  .badge-celebrate .bc-ring {
+    position: absolute; left: 50%; top: 50%;
+    width: 170px; height: 170px; margin: -85px 0 0 -85px; border-radius: 50%;
+    border: 2px dashed color-mix(in srgb, #FFC94D 75%, transparent);
+    animation: bc-spin 7s linear infinite;
+  }
+  @keyframes bc-spin { to { transform: rotate(360deg); } }
+  .badge-celebrate .bc-medal {
+    position: relative; z-index: 2;
+    width: 124px; height: 124px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 60px; line-height: 1;
+    background: radial-gradient(circle at 32% 28%, #FFF4D6, #FFC94D 55%, #E89A1E);
+    border: 4px solid #fff;
+    box-shadow: 0 14px 36px rgba(180, 118, 18, .45), inset 0 2px 6px rgba(255,255,255,.7), inset 0 -5px 12px rgba(180,108,10,.35);
+    animation: bc-medal-pop .65s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes bc-medal-pop {
+    0%   { transform: scale(0) rotate(-30deg); }
+    60%  { transform: scale(1.16) rotate(6deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+  .badge-celebrate .bc-title {
+    position: relative; z-index: 2; margin-top: 22px;
+    font-size: 22px; font-weight: 800; letter-spacing: 2px; color: var(--text);
+    animation: txt-up .5s cubic-bezier(.22,1,.36,1) .1s both;
+  }
+  .badge-celebrate .bc-name {
+    position: relative; z-index: 2; margin-top: 10px;
+    font-size: 16px; font-weight: 700; color: var(--text);
+    background: var(--card); padding: 6px 18px; border-radius: 999px;
+    box-shadow: var(--shadow);
+    animation: txt-up .5s cubic-bezier(.22,1,.36,1) .18s both;
+  }
+  .badge-celebrate .bc-sub {
+    position: relative; z-index: 2; margin-top: 9px;
+    font-size: 12.5px; color: var(--text-2); letter-spacing: 1px;
+    animation: txt-up .5s cubic-bezier(.22,1,.36,1) .26s both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .badge-celebrate .bc-medal, .badge-celebrate .bc-ring, .badge-celebrate .bc-glow { animation: none; }
+  }
+
   /* ============ 弹层（Routine 看板 / 设置） ============ */
   .modal-backdrop {
     position: fixed; inset: 0; z-index: 250;

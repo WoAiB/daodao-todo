@@ -69,6 +69,45 @@ export function showCelebration(count = 1) {
   celebTimer = setTimeout(() => { el.remove(); celebEl = null; }, 1600);
 }
 
+/* ── 获得奖章动效 ── */
+const TIER_EMOJI = { bronze: '🥉', silver: '🥈', gold: '🥇' };
+let badgeEl = null, badgeTimer = null;
+export function showBadgeCelebration(badges) {
+  if (!badges || !badges.length) return;
+  if (badgeEl) badgeEl.remove();
+  clearTimeout(badgeTimer);
+
+  const el = document.createElement('div');
+  el.className = 'badge-celebrate';
+
+  // 彩带：一次拿越多越热闹
+  const n = 24 + Math.min(badges.length, 5) * 8;
+  const colors = ['#EF6E5A', '#EFAF3C', '#55B37E', '#EF87A5', '#6B9CD8', '#F7B26C', '#B78BE0', '#5BC0BE'];
+  let particles = '';
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const d = 90 + Math.random() * 180;
+    const c = colors[i % colors.length];
+    const s = 5 + Math.random() * 8;
+    particles += `<i class="fw-p" style="--dx:${(Math.cos(a) * d).toFixed(0)}px;--dy:${(Math.sin(a) * d).toFixed(0)}px;` +
+      `background:${c};width:${s.toFixed(0)}px;height:${s.toFixed(0)}px;animation-delay:${(Math.random() * 0.15).toFixed(2)}s"></i>`;
+  }
+
+  const medal = TIER_EMOJI[badges[0].tier] || '🏅';
+  const name = badges.map(b => b.name).join('、');
+
+  el.innerHTML = `<div class="bc-backdrop"></div><div class="bc-glow"></div>${particles}` +
+    `<div class="bc-ring"></div>` +
+    `<div class="bc-medal">${medal}</div>` +
+    `<div class="bc-title">🎉 恭喜获得奖章 🎉</div>` +
+    `<div class="bc-name">${esc(name)}</div>` +
+    `<div class="bc-sub">${badges.length > 1 ? `一次拿下 ${badges.length} 枚！` : '继续加油，向下一枚冲刺！'}</div>`;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('show'));
+  badgeEl = el;
+  badgeTimer = setTimeout(() => { el.remove(); badgeEl = null; }, 2400);
+}
+
 /* ── 习惯视图模型：本周进度 + 连续天数（由 habitLogs 计算） ── */
 export function buildRoutineVMs(routines, logs) {
   const week = weekDates(0).map(dateStr);

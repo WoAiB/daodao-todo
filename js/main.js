@@ -137,10 +137,7 @@ async function toggleTask(id, done) {
     R.showCelebration(doneCount);
     // 完成后结算奖章（连续全勤/清零到节点即发）
     const fresh = await B.evaluate();
-    if (fresh.length) {
-      R.toast(`🏅 获得奖章「${fresh.map(b => b.name).join('」「')}」！`);
-      R.showCelebration(doneCount);
-    }
+    if (fresh.length) R.showBadgeCelebration(fresh);
   }
 }
 
@@ -1469,7 +1466,7 @@ $('mascotBig').addEventListener('click', () => {
 });
 
 /* ═══════════ 调试钩子：控制台里 window.__daodao.handleVoiceText('明天下午三点组会') 可直接测解析 ═══════════ */
-window.__daodao = { handleVoiceText, openTextParser, refresh, llmParse };
+window.__daodao = { handleVoiceText, openTextParser, refresh, llmParse, showBadgeCelebration: R.showBadgeCelebration };
 
 /* ═══════════ 启动 ═══════════ */
 async function init() {
@@ -1517,7 +1514,10 @@ async function init() {
   $('weekRange').textContent = `${short(wk[0])} – ${short(wk[6])}`;
 
   await refresh();
-  try { await B.evaluate(); } catch (e) { console.error('奖章结算失败：', e); } // 启动补发（跨周/隔天）
+  try {
+    const fresh = await B.evaluate(); // 启动补发（跨周/隔天）
+    if (fresh.length) R.showBadgeCelebration(fresh);
+  } catch (e) { console.error('奖章结算失败：', e); }
   checkEveningReminder().catch(() => {}); // 打开页面即检查一次（若已过提醒时间且今天未提醒）
   setInterval(() => { applyAutoTheme(); R.updateNowLine(false); checkEveningReminder().catch(() => {}); }, 60000);
   window.addEventListener('resize', () => R.updateNowLine(false));
